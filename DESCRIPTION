@@ -6,22 +6,22 @@ Authors@R: c(
            family = "Maden",
            role = c("aut", "cre"),
            email = "maden.sean@gmail.com",
-           comment = c(ORCID = "0000-0002-2212-4894"))
+           comment = c(ORCID = "0000-0002-2212-4894")),
     person(given = "Jenny",
            family = "Smith",
-           role = c("aut"))
+           role = c("aut")),
     person(given = "David",
            family = "Lee",
-           role = c("aut"))
+           role = c("aut")),
     person(given = "Ronald",
            family = "Buie",
-           role = c("aut"))
+           role = c("aut")),
     person(given = "Vikas",
            family = "Peddu",
-           role = c("aut"))
+           role = c("aut")),
     person(given = "Ryan",
            family = "Shean",
-           role = c("aut"))
+           role = c("aut")),
     person(given = "Ben",
            family = "Busby",
            role = c("aut")))
