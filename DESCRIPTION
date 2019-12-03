@@ -1,0 +1,56 @@
+Package: cmlmanuscript
+Title: Resource to reproduce manuscript analyses
+Version: 1.0.0
+Authors@R: 
+    person(given = "Sean",
+           family = "Maden",
+           role = c("aut", "cre"),
+           email = "maden.sean@gmail.com",
+           comment = c(ORCID = "0000-0002-2212-4894"))
+    person(given = "Jenny",
+           family = "Smith",
+           role = c("aut", "cre"))
+    person(given = "David",
+           family = "Lee",
+           role = c("aut", "cre"))
+    person(given = "Ronald",
+           family = "Buie",
+           role = c("aut", "cre"))
+    person(given = "Vikas",
+           family = "Peddu",
+           role = c("aut", "cre"))
+    person(given = "Ryan",
+           family = "Shean",
+           role = c("aut", "cre"))
+    person(given = "Ben",
+           family = "Busby",
+           role = c("aut", "cre"))
+Description: Resource for reproducing manuscript analyses. Functions enable data coercion and management, running machine learning analyses, and reproducing tables and figures.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Imports:
+        data.table
+        SummarizedExperiment
+        GenomicRanges
+        edgeR
+        limma
+        biomaRt
+        MultiAssayExperiment
+        gridExtra
+        ggplot2
+        FactoMineR
+        factoextra
+        ggbiplot
+        enrichR
+        UpSetR
+        ggcorrplot
+        Rtsne
+        Boruta
+        glmnet
+        ComplexHeatmap
+        circlize
+        reshape
+        randomForest
+        xgboost
+        e1071
