@@ -9,22 +9,22 @@ Authors@R:
            comment = c(ORCID = "0000-0002-2212-4894"))
     person(given = "Jenny",
            family = "Smith",
-           role = c("aut", "cre"))
+           role = c("aut"))
     person(given = "David",
            family = "Lee",
-           role = c("aut", "cre"))
+           role = c("aut"))
     person(given = "Ronald",
            family = "Buie",
-           role = c("aut", "cre"))
+           role = c("aut"))
     person(given = "Vikas",
            family = "Peddu",
-           role = c("aut", "cre"))
+           role = c("aut"))
     person(given = "Ryan",
            family = "Shean",
-           role = c("aut", "cre"))
+           role = c("aut"))
     person(given = "Ben",
            family = "Busby",
-           role = c("aut", "cre"))
+           role = c("aut"))
 Description: Resource for reproducing manuscript analyses. Functions enable data coercion and management, running machine learning analyses, and reproducing tables and figures.
 License: MIT
 Encoding: UTF-8
