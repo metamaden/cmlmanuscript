@@ -1,79 +1,18 @@
 #!/usr/bin/env R
 
-# Machine learning functions
-
 # Run machine learning
+
+#' Fit a SupportVectorMachines model.
+#'
+#' This function runs lasso using a SummarizedExperiment object. Credit base code: Jenny Smith.
+#'
+#' @param seed Set a random seed for the SVM run.
+#' @param kerneltype Choose the kernel type for the SVM run.
+#' @param sest A valid SummarizedExperiment object, including variable for test and training subsets.
+#' @param weightfilt False or numeric float. Float specifies the fraction of absolute weights to retain in the fitted model.
+#' @return A `resultslist` object containing the fitted model, predictions, and performacne metrics.
 #' @export
-runLasso <- function(seset, seed=2019){
-  # runLasso
-  # Fit a model using penalized regression with lasso
-  # Arguments:
-  # * sese: Valid summarized experiment object
-  # * seed: (int) set seed for randomization
-  # Returns:
-  # * resultslist (list) : Results of lasso fit
-  set.seed(seed)
-
-  gene.names = as.character(rownames(rowData(seset)))
-  var.classifier = seset$deg.risk
-  df = t(assay(seset))
-  train.names = colnames(assay(seset[,seset$exptset.seahack=="train"]))
-  test.names = colnames(assay(seset[,seset$exptset.seahack=="test"]))
-  response <- var.classifier
-  predictors <- gene.names
-  y <- factor(response); names(y) <- colnames(assay(seset)) # response var obj
-  x = df[,colnames(df) %in% predictors] # genes of interest
-  contrast <- contrasts(y)
-  grid <- 10^ seq(10,-2, length=100)
-  standardize = FALSE
-  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=1,
-                standardize = standardize, lambda = grid, intercept = FALSE)
-
-  # use cross-validation on the training model.CV only for lambda
-  cv.fit <- glmnet::cv.glmnet(x[train.names,], y[train.names], family = "binomial",
-                      type.logistic="modified.Newton", standardize = standardize,
-                      lambda = grid, alpha=1, nfolds = length(train.names), #LOOCV
-                      type.measure = "class", intercept = FALSE)
-  #Select lambda min.
-  lambda.min <- cv.fit$lambda.min
-  #predict the classes
-  pred.class <- predict(fit, newx = x[test.names,], type="class", s=lambda.min)
-  #find the test error
-  tab <- table(pred.class,y[test.names])
-  testError <- mean(pred.class != y[test.names]) #how many predicted classes were incorrect
-  #Fit the full dataset.
-  final <- glmnet::glmnet(x, y,family = "binomial", standardize = standardize,
-                  lambda = grid, alpha = 1, intercept = FALSE)
-  #Extract the coefficients
-  coef <- predict(final, type="coefficients", s=lambda.min)
-  idx <- which(!as.numeric(coef)==0)
-  nonZero <- coef[idx,]
-  #Results
-  resultslist <- list(train.names, test.names, contrast, fit,
-                      cv.fit, tab, testError, final, nonZero, seed)
-  names(resultslist) <- c("training.set", "testing.set","contrast", "train.fit",
-                          "cv.fit", "confusionMatrix","test.error", "final.model",
-                          "nonzero.coef", "seed")
-  return(resultslist)
-}
-
-#' @export
-runSVM <- function(seed,kerneltype="linear",seset, weightfilt=FALSE){
-  # credit base code: Sean Maden
-  # run SVM optimization
-  # Arguments
-  #   * seed : set seed (int) for randomization
-  #   * kerneltype : (str) valid kernel type class for SVM (e.g. 'linear', 'radial', etc.)
-  #   * seset : summarized expirment object with both test and training set data.
-  #       * ndtr : training dataset (excluding sample classes)
-  #       * ndtr.classes : classes for training sampels (vector) with 1:1 correspondence
-  #       with trainset rows
-  #       * ndte : test data (data frame or matrix), excluding classes
-  #       * ndte.classes : classes for test samples (vector), with 1:1 row:pos correspondence
-  #   * weightfilt : (FALSE or numeric float) top fraction weights to use in model
-  #       (if FALSE, then all weights used)
-  # Returns
-  #   * rl (list) : list containing model fitted, predictions, and performacne metrics
+runSVM <- function(seed,kerneltype = "linear", seset, weightfilt = FALSE){
   rl <- list(); str.options <- ""
   set.seed(seed)
 
@@ -161,9 +100,79 @@ runSVM <- function(seed,kerneltype="linear",seset, weightfilt=FALSE){
 
 }
 
-# Importance Functions
+#' Run lasso
+#'
+#' This function runs lasso using a SummarizedExperiment object. Credit base code: Jenny Smith.
+#'
+#' @param seset A SummarizedExperiment object.
+#' @return A `resultslist` object containing the fitted model and evaluation info.
 #' @export
-impLasso <- function(df, classes, trainindices, seed=2019){
+runLasso <- function(seset, seed = 2019){
+  # runLasso
+  # Fit a model using penalized regression with lasso
+  # Arguments:
+  # * sese: Valid summarized experiment object
+  # * seed: (int) set seed for randomization
+  # Returns:
+  # * resultslist (list) : Results of lasso fit
+  set.seed(seed)
+
+  gene.names = as.character(rownames(rowData(seset)))
+  var.classifier = seset$deg.risk
+  df = t(assay(seset))
+  train.names = colnames(assay(seset[,seset$exptset.seahack=="train"]))
+  test.names = colnames(assay(seset[,seset$exptset.seahack=="test"]))
+  response <- var.classifier
+  predictors <- gene.names
+  y <- factor(response); names(y) <- colnames(assay(seset)) # response var obj
+  x = df[,colnames(df) %in% predictors] # genes of interest
+  contrast <- contrasts(y)
+  grid <- 10^ seq(10,-2, length=100)
+  standardize = FALSE
+  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=1,
+                        standardize = standardize, lambda = grid, intercept = FALSE)
+
+  # use cross-validation on the training model.CV only for lambda
+  cv.fit <- glmnet::cv.glmnet(x[train.names,], y[train.names], family = "binomial",
+                              type.logistic="modified.Newton", standardize = standardize,
+                              lambda = grid, alpha=1, nfolds = length(train.names), #LOOCV
+                              type.measure = "class", intercept = FALSE)
+  #Select lambda min.
+  lambda.min <- cv.fit$lambda.min
+  #predict the classes
+  pred.class <- predict(fit, newx = x[test.names,], type="class", s=lambda.min)
+  #find the test error
+  tab <- table(pred.class,y[test.names])
+  testError <- mean(pred.class != y[test.names]) #how many predicted classes were incorrect
+  #Fit the full dataset.
+  final <- glmnet::glmnet(x, y,family = "binomial", standardize = standardize,
+                          lambda = grid, alpha = 1, intercept = FALSE)
+  #Extract the coefficients
+  coef <- predict(final, type="coefficients", s=lambda.min)
+  idx <- which(!as.numeric(coef)==0)
+  nonZero <- coef[idx,]
+  #Results
+  resultslist <- list(train.names, test.names, contrast, fit,
+                      cv.fit, tab, testError, final, nonZero, seed)
+  names(resultslist) <- c("training.set", "testing.set","contrast", "train.fit",
+                          "cv.fit", "confusionMatrix","test.error", "final.model",
+                          "nonzero.coef", "seed")
+  return(resultslist)
+}
+
+# Importance Functions
+
+#' Feature importance from lasso
+#'
+#' Returns feature importance from fitting a model using lasso.
+#'
+#' @param df Valid data object.
+#' @param classes Vector of class specifying test or training set among instances.
+#' @param trainindices Which instances correspond to the training set.
+#' @param seed Random seed to use in model fitting.
+#' @return Lasso feature importances.
+#' @export
+impLasso <- function(df, classes, trainindices, seed = 2019){
   # df : data frame to parse, rownames = classifier groupings, colnames = feature ids
   set.seed(seed)
   var.classifier <- response <- as.character(classes)
@@ -193,8 +202,17 @@ impLasso <- function(df, classes, trainindices, seed=2019){
   return(lassoimp)
 }
 
+#' Feature importance from random forest
+#'
+#' Returns feature importance from fitting a model using random forests.
+#'
+#' @param df Valid data object.
+#' @param classes Vector of class specifying test or training set among instances.
+#' @param ntrees Number of trees to use in random forest run.
+#' @param seed Random seed to use in model fitting.
+#' @return Random forest feature importances.
 #' @export
-impRF <- function(df, classes, ntrees=100, seed=2019){
+impRF <- function(df, classes, ntrees = 100, seed = 2019){
   set.seed(seed)
   class <- as.numeric(classes)
   rffit <- randomForest::randomForest(class ~ ., data = as.matrix(df), ntree = ntrees,proximity = TRUE)
@@ -202,8 +220,16 @@ impRF <- function(df, classes, ntrees=100, seed=2019){
   return(rfimp)
 }
 
+#' Feature importance from eXtreme Gradient Boost (XGBoost)
+#'
+#' Returns feature importance from fitting a model using XGBoost.
+#'
+#' @param df Valid data object.
+#' @param classes Vector of class specifying test or training set among instances.
+#' @param seed Random seed to use in model fitting.
+#' @return XGBoost feature importances.
 #' @export
-impXGB <- function(df, classes, seed=2019){
+impXGB <- function(df, classes, seed = 2019){
   set.seed(2019)
   message("fitting xgboost model...")
   xgbfit <- xgboost::xgboost(data = df, label = classes, max_depth = 2,
@@ -223,8 +249,16 @@ impXGB <- function(df, classes, seed=2019){
   return(xgbimp.format)
 }
 
+#' Feature importance from Support Vector Machines (SVM)
+#'
+#' Returns feature importance from fitting a model using SVM
+#'
+#' @param df Valid data object.
+#' @param classes Vector of class specifying test or training set among instances.
+#' @param seed Random seed to use in model fitting.
+#' @return SVM feature importances.
 #' @export
-impSVM <- function(df, classes, seed=2019){
+impSVM <- function(df, classes, seed = 2019){
   set.seed(2019)
   message("fitting svm model...")
   svmfit <- e1071::svm(as.factor(classes)~.,
@@ -238,9 +272,21 @@ impSVM <- function(df, classes, seed=2019){
   return(svmimp.format)
 }
 
+#' Feature importance from Consensus Machine Learning (CML)
+#'
+#' Returns feature importance from fitting a model using CML
+#'
+#' @param df Valid data object.
+#' @param classes Vector of class specifying test or training set among instances.
+#' @param trainindices Indices of traning instances in data.
+#' @param seed Random seed to use in model fitting.
+#' @param algo.opt Algorithms to use for consensus method.
+#' @param standtable Boolean, whether to return a standard output table summarizing results.
+#' @param ranksummary Method to compute rank summary among algorithms used, currently supports 'median'.
+#' @return Consensus feature importance.
 #' @export
-impCML <- function(df, classes, trainindices, seed, algo.opt=c("lasso","rf","svm","xgb"),
-                   standtable=FALSE, ranksummary="median"){
+impCML <- function(df, classes, trainindices, seed, algo.opt = c("lasso","rf","svm","xgb"),
+                   standtable = FALSE, ranksummary = "median"){
   # impCML
   # Get consensus importance ranks from disparate algorithms.
   # Arguments
@@ -324,21 +370,19 @@ impCML <- function(df, classes, trainindices, seed, algo.opt=c("lasso","rf","svm
   return(lr)
 }
 
+#' Feature importance from Consensus Machine Learning (CML) using the Boruta method
+#'
+#' Returns feature importance from fitting a model using CML with the Boruta method.
+#'
+#' @param x Valid data object.
+#' @param y Vector of classes among instances in data object.
+#' @param seed Random seed to use in model fitting.
+#' @param algo.opt Algorithms to use for consensus method.
+#' @param ranksummary Method to compute rank summary among algorithms used, currently supports 'median'.
+#' @return Consensus feature importance.
 #' @export
-impBorutaCML <- function(x=x, y=y, seed, algo.opt=c("lasso","rf","svm","xgb"),
-                   ranksummary="median"){
-  # impCML
-  # Get consensus importance ranks from disparate algorithms.
-  # Arguments
-  # * df (matrix) : data table (rows = instances, columns = features)
-  # * classes (character): categorizations of instances
-  # * algo.opt (list): List of valid algorithms to use for consensus
-  # * seed (int): Set the seed for reproducibility
-  # * trainindices (numeric, optional): Vector of dataset (rows) corresponding to training sample subsert. Only used for Lasso cross validation step.
-  # * ranksummary (string): Either "median" or "mean", the operation used to calculate consensus rank.
-  # Returns:
-  # * Consensus rank, optionally a standard output table of importances for selected algorithms (if standtable==TRUE)
-
+impBorutaCML <- function(x = x, y = y, seed, algo.opt = c("lasso","rf","svm","xgb"),
+                   ranksummary = "median"){
   df <- x
   classes <- y
 
