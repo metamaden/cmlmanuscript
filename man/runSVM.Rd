@@ -19,5 +19,5 @@ runSVM(seed, kerneltype = "linear", seset, weightfilt = FALSE)
 A `resultslist` object containing the fitted model, predictions, and performacne metrics.
 }
 \description{
-This function runs lasso using a SummarizedExperiment object. Credit base code: Jenny Smith.
+This function runs lasso using a SummarizedExperiment object. Credit base code: Sean Maden.
 }

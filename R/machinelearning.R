@@ -4,7 +4,7 @@
 
 #' Fit a SupportVectorMachines model.
 #'
-#' This function runs lasso using a SummarizedExperiment object. Credit base code: Jenny Smith.
+#' This function runs lasso using a SummarizedExperiment object. Credit base code: Sean Maden.
 #'
 #' @param seed Set a random seed for the SVM run.
 #' @param kerneltype Choose the kernel type for the SVM run.
