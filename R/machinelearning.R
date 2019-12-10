@@ -220,6 +220,66 @@ runRidge <- function(seset, seed = 2019){
   return(resultslist)
 }
 
+#' Run elastic net regression
+#'
+#' This function runs elastic net regression (with alpha 0.5) using a SummarizedExperiment object. Credit base code: Jenny Smith.
+#'
+#' @param seset A SummarizedExperiment object.
+#' @return A `resultslist` object containing the fitted model and evaluation info.
+#' @export
+runEnet <- function(seset, seed = 2019){
+  # runRidge
+  # Fit a model using penalized regression with ridge regression penalty.
+  # Arguments:
+  # * sese: Valid summarized experiment object
+  # * seed: (int) set seed for randomization
+  # Returns:
+  # * resultslist (list) : Results of lasso fit
+  set.seed(seed)
+  
+  gene.names = as.character(rownames(rowData(seset)))
+  var.classifier = seset$deg.risk
+  df = t(assay(seset))
+  train.names = colnames(assay(seset[,seset$exptset.seahack=="train"]))
+  test.names = colnames(assay(seset[,seset$exptset.seahack=="test"]))
+  response <- var.classifier
+  predictors <- gene.names
+  y <- factor(response); names(y) <- colnames(assay(seset)) # response var obj
+  x = df[,colnames(df) %in% predictors] # genes of interest
+  contrast <- contrasts(y)
+  grid <- 10^ seq(10,-2, length=100)
+  standardize = FALSE
+  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=1,
+                        standardize = standardize, lambda = grid, intercept = FALSE)
+  
+  # use cross-validation on the training model.CV only for lambda
+  cv.fit <- glmnet::cv.glmnet(x[train.names,], y[train.names], family = "binomial",
+                              type.logistic="modified.Newton", standardize = standardize,
+                              lambda = grid, alpha=0.5, nfolds = length(train.names), #LOOCV
+                              type.measure = "class", intercept = FALSE)
+  #Select lambda min.
+  lambda.min <- cv.fit$lambda.min
+  #predict the classes
+  pred.class <- predict(fit, newx = x[test.names,], type="class", s=lambda.min)
+  #find the test error
+  tab <- table(pred.class,y[test.names])
+  testError <- mean(pred.class != y[test.names]) #how many predicted classes were incorrect
+  #Fit the full dataset.
+  final <- glmnet::glmnet(x, y,family = "binomial", standardize = standardize,
+                          lambda = grid, alpha = 1, intercept = FALSE)
+  #Extract the coefficients
+  coef <- predict(final, type="coefficients", s=lambda.min)
+  idx <- which(!as.numeric(coef)==0)
+  nonZero <- coef[idx,]
+  #Results
+  resultslist <- list(train.names, test.names, contrast, fit,
+                      cv.fit, tab, testError, final, nonZero, seed)
+  names(resultslist) <- c("training.set", "testing.set","contrast", "train.fit",
+                          "cv.fit", "confusionMatrix","test.error", "final.model",
+                          "nonzero.coef", "seed")
+  return(resultslist)
+}
+
 # Importance Functions
 
 #' Feature importance from lasso
