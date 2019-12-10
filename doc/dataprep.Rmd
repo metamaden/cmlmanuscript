@@ -1,0 +1,71 @@
+---
+title: "analysis"
+output: html_document
+---
+
+```{r docprep, eval = TRUE, echo = TRUE}
+library(cmlmanuscript)
+data("deg_seset_targetaml")
+dim(deg.seset)
+```
+
+
+This document describes analysis for the manuscript "Consensus Machine Learning for Gene Target Selection in Pediatric AML Risk" and utilizes the corresponding package `cmlmanuscript`.
+
+# Data Summaries and Pre-filtering Samples with Risk Group Available
+
+## Dimensions of dataset
+```{r degsummary, eval=TRUE, echo=TRUE}
+dim(deg.seset)
+```
+
+
+
+# [1] 1984  145
+
+## Risk group variable
+```{r}
+table(deg.seset$Risk.group)
+```
+
+We defined binary risk group from risk group as follows.
+```{r defrg, echo = TRUE, eval = TRUE}
+deg.seset$deg.risk <- ifelse(deg.seset$Risk.group=="Low", 0,
+                             ifelse(deg.seset$Risk.group %in% c("Standard","High"),1,"NA"))
+table(deg.seset$deg.risk)
+
+message("table of risk group x binarized risk group")
+table(deg.seset$deg.risk, deg.seset$Risk.group)
+```
+
+## Risk group filter
+
+We filtered samples according to available risk group status.
+
+```{r datafilt, }
+degfilt.se <- deg.seset[,which(deg.seset$deg.risk %in% c(0,1))] # subset on deg risk group available
+message("dim of filtered se object")
+dim(degfilt.se)
+```
+
+## Post-filter data summary
+
+Next, we checked for confounding from demographic variables (age and sex) among binary risk group. This ensured age and sex do not confound the binary risk group variable.
+
+```{r postfiltsummary, echo = T, eval = T}
+# summarize gender and age at first diagnosis
+message("table of gender x binarized risk")
+table(degfilt.se$Gender,degfilt.se$deg.risk)
+
+message("chisq test of gender x binarized risk")
+chisq.test(table(degfilt.se$Gender,degfilt.se$deg.risk)) # p-value = 0.8044, gender evenly dist
+
+degfilt.se$binom.age <- ifelse(degfilt.se$Age.at.Diagnosis.in.Days >= median(degfilt.se$Age.at.Diagnosis.in.Days), "old" ,"young")
+message("table of binarized age-at-diag x binarized risk")
+table(degfilt.se$binom.age,degfilt.se$deg.risk)
+
+message("chisq results of binarized age-at-diag x binarized risk")
+chisq.test(table(degfilt.se$binom.age,degfilt.se$deg.risk))
+```
+```
+

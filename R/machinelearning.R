@@ -176,7 +176,7 @@ runRidge <- function(seset, seed = 2019){
   # Returns:
   # * resultslist (list) : Results of lasso fit
   set.seed(seed)
-  
+
   gene.names = as.character(rownames(rowData(seset)))
   var.classifier = seset$deg.risk
   df = t(assay(seset))
@@ -189,9 +189,9 @@ runRidge <- function(seset, seed = 2019){
   contrast <- contrasts(y)
   grid <- 10^ seq(10,-2, length=100)
   standardize = FALSE
-  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=1,
+  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=0,
                         standardize = standardize, lambda = grid, intercept = FALSE)
-  
+
   # use cross-validation on the training model.CV only for lambda
   cv.fit <- glmnet::cv.glmnet(x[train.names,], y[train.names], family = "binomial",
                               type.logistic="modified.Newton", standardize = standardize,
@@ -236,7 +236,7 @@ runEnet <- function(seset, seed = 2019){
   # Returns:
   # * resultslist (list) : Results of lasso fit
   set.seed(seed)
-  
+
   gene.names = as.character(rownames(rowData(seset)))
   var.classifier = seset$deg.risk
   df = t(assay(seset))
@@ -249,9 +249,9 @@ runEnet <- function(seset, seed = 2019){
   contrast <- contrasts(y)
   grid <- 10^ seq(10,-2, length=100)
   standardize = FALSE
-  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=1,
+  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=0.5,
                         standardize = standardize, lambda = grid, intercept = FALSE)
-  
+
   # use cross-validation on the training model.CV only for lambda
   cv.fit <- glmnet::cv.glmnet(x[train.names,], y[train.names], family = "binomial",
                               type.logistic="modified.Newton", standardize = standardize,

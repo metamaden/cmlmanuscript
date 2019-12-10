@@ -1,0 +1,57 @@
+---
+title: "exclusionbias"
+author: "SKM"
+date: "12/9/2019"
+output: html_document
+---
+
+```{r docprep, eval = TRUE, echo = TRUE}
+library(cmlmanuscript)
+load(dataprep.Rdata)
+```
+
+We performed ablation tests to assess the impact of exclusion bias. Feature exclusion bias reflects the fact that feature assessment, and ultimate exlcusion or exclusion from penalized regression, is biased by inclusion or exclusion of other features. We showed this bias through ablation of penalized regression runs, using three penalization schema (lasso, ridge regression, and elastic net).
+
+# Ablation tests
+
+To perform ablation tests, we performed penalized regression with one of three penalization strategies (lasso, ridge regression, or elastic net). We initially fitted a model with the chosen schema. In subsequent reps, we excluded features with the largest coefficients, or any features with nonzero coefficients for lasso, and repeated penalized regression.
+
+## Lasso
+
+```{r lasso_allreps, warning=FALSE}
+ptype = "lasso"
+lexclude = list()
+lrep = list()
+for(i in 1:15){
+  if(i == 1){
+    lrep[[i]] = runLasso(seset = degfilt.se)
+  } else{
+    lrep[[i]] = runLasso(seset=degfilt.se[!rownames(degfilt.se) %in% unlist(lexclude),])
+  }
+  lexclude[[i]] = names(lrep[[i]]$nonzero.coef)
+  message("finished ", ptype," rep ", i)
+}
+```
+
+## Ridge regression
+
+Because ridge regression does not eliminate features by assignment of 0 coefficients, we removed genes with the top 5th quantile absolute importance (coefficient magnitude) between repetitions.
+
+```{r lasso_allreps, warning=FALSE}
+ptype = "ridge regression"
+qimpfilt = 5
+lexclude = list()
+lrep = list()
+for(i in 1:15){
+  if(i == 1){
+    lrep[[i]] = runLasso(seset = degfilt.se)
+  } else{
+    lrep[[i]] = runLasso(seset=degfilt.se[!rownames(degfilt.se) %in% unlist(lexclude),])
+  }
+  lexclude[[i]] = names(lrep[[i]]$nonzero.coef)
+  message("finished ", ptype," rep ", i)
+}
+```
+
+
+## Elastic net 
