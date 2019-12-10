@@ -18,7 +18,7 @@ To perform ablation tests, we performed penalized regression with one of three p
 
 ## Lasso
 
-```{r lasso_allreps, warning=FALSE}
+```{r lassoreps, warning=FALSE}
 ptype = "lasso"
 lexclude = list()
 lrep = list()
@@ -37,17 +37,20 @@ for(i in 1:15){
 
 Because ridge regression does not eliminate features by assignment of 0 coefficients, we removed genes with the top 5th quantile absolute importance (coefficient magnitude) between repetitions.
 
-```{r lasso_allreps, warning=FALSE}
+```{r ridgereps, warning=FALSE}
 ptype = "ridge regression"
 qimpfilt = 5
 lexclude = list()
 lrep = list()
 for(i in 1:15){
   if(i == 1){
-    lrep[[i]] = runLasso(seset = degfilt.se)
+    lrep[[i]] = runRidge(seset = degfilt.se)
   } else{
     lrep[[i]] = runLasso(seset=degfilt.se[!rownames(degfilt.se) %in% unlist(lexclude),])
   }
+  
+  
+  
   lexclude[[i]] = names(lrep[[i]]$nonzero.coef)
   message("finished ", ptype," rep ", i)
 }

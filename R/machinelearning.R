@@ -105,9 +105,11 @@ runSVM <- function(seed,kerneltype = "linear", seset, weightfilt = FALSE){
 #' This function runs lasso using a SummarizedExperiment object. Credit base code: Jenny Smith.
 #'
 #' @param seset A SummarizedExperiment object.
+#' @param seed Random seed for model fit.
+#' @param alphamodel Alpha value for glmnet model (0 : ridge regression, 0<a<1 : elastic net, 1 : lasso)
 #' @return A `resultslist` object containing the fitted model and evaluation info.
 #' @export
-runLasso <- function(seset, seed = 2019){
+runLasso <- function(seset, seed = 2019, alphamodel = 1){
   # runLasso
   # Fit a model using penalized regression with lasso
   # Arguments:
@@ -129,13 +131,13 @@ runLasso <- function(seset, seed = 2019){
   contrast <- contrasts(y)
   grid <- 10^ seq(10,-2, length=100)
   standardize = FALSE
-  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=1,
+  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha = alphamodel,
                         standardize = standardize, lambda = grid, intercept = FALSE)
 
   # use cross-validation on the training model.CV only for lambda
   cv.fit <- glmnet::cv.glmnet(x[train.names,], y[train.names], family = "binomial",
                               type.logistic="modified.Newton", standardize = standardize,
-                              lambda = grid, alpha=1, nfolds = length(train.names), #LOOCV
+                              lambda = grid, alpha = alphamodel, nfolds = length(train.names), #LOOCV
                               type.measure = "class", intercept = FALSE)
   #Select lambda min.
   lambda.min <- cv.fit$lambda.min
@@ -146,7 +148,7 @@ runLasso <- function(seset, seed = 2019){
   testError <- mean(pred.class != y[test.names]) #how many predicted classes were incorrect
   #Fit the full dataset.
   final <- glmnet::glmnet(x, y,family = "binomial", standardize = standardize,
-                          lambda = grid, alpha = 1, intercept = FALSE)
+                          lambda = grid, alpha = alphamodel, intercept = FALSE)
   #Extract the coefficients
   coef <- predict(final, type="coefficients", s=lambda.min)
   idx <- which(!as.numeric(coef)==0)
@@ -165,16 +167,11 @@ runLasso <- function(seset, seed = 2019){
 #' This function runs ridge regression using a SummarizedExperiment object. Credit base code: Jenny Smith.
 #'
 #' @param seset A SummarizedExperiment object.
+#' @param seed Random seed for model fit.
+#' @param alphamodel Alpha value for glmnet model (0 : ridge regression, 0<a<1 : elastic net, 1 : lasso)
 #' @return A `resultslist` object containing the fitted model and evaluation info.
 #' @export
-runRidge <- function(seset, seed = 2019){
-  # runRidge
-  # Fit a model using penalized regression with ridge regression penalty.
-  # Arguments:
-  # * sese: Valid summarized experiment object
-  # * seed: (int) set seed for randomization
-  # Returns:
-  # * resultslist (list) : Results of lasso fit
+runRidge <- function(seset, seed = 2019, alphamodel = 0){
   set.seed(seed)
 
   gene.names = as.character(rownames(rowData(seset)))
@@ -189,24 +186,24 @@ runRidge <- function(seset, seed = 2019){
   contrast <- contrasts(y)
   grid <- 10^ seq(10,-2, length=100)
   standardize = FALSE
-  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=0,
+  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=alphamodel,
                         standardize = standardize, lambda = grid, intercept = FALSE)
 
   # use cross-validation on the training model.CV only for lambda
   cv.fit <- glmnet::cv.glmnet(x[train.names,], y[train.names], family = "binomial",
                               type.logistic="modified.Newton", standardize = standardize,
-                              lambda = grid, alpha=0, nfolds = length(train.names), #LOOCV
+                              lambda = grid, alpha=alphamodel, nfolds = length(train.names), #LOOCV
                               type.measure = "class", intercept = FALSE)
   #Select lambda min.
   lambda.min <- cv.fit$lambda.min
   #predict the classes
   pred.class <- predict(fit, newx = x[test.names,], type="class", s=lambda.min)
   #find the test error
-  tab <- table(pred.class,y[test.names])
+  tab <- table(pred.class,y[test.names]) # confusion matrix from test set
   testError <- mean(pred.class != y[test.names]) #how many predicted classes were incorrect
   #Fit the full dataset.
   final <- glmnet::glmnet(x, y,family = "binomial", standardize = standardize,
-                          lambda = grid, alpha = 1, intercept = FALSE)
+                          lambda = grid, alpha = alphamodel, intercept = FALSE)
   #Extract the coefficients
   coef <- predict(final, type="coefficients", s=lambda.min)
   idx <- which(!as.numeric(coef)==0)
@@ -225,16 +222,11 @@ runRidge <- function(seset, seed = 2019){
 #' This function runs elastic net regression (with alpha 0.5) using a SummarizedExperiment object. Credit base code: Jenny Smith.
 #'
 #' @param seset A SummarizedExperiment object.
+#' @param seed Random seed for model fit.
+#' @param alphamodel Alpha value for glmnet model (0 : ridge regression, 0<a<1 : elastic net, 1 : lasso)
 #' @return A `resultslist` object containing the fitted model and evaluation info.
 #' @export
-runEnet <- function(seset, seed = 2019){
-  # runRidge
-  # Fit a model using penalized regression with ridge regression penalty.
-  # Arguments:
-  # * sese: Valid summarized experiment object
-  # * seed: (int) set seed for randomization
-  # Returns:
-  # * resultslist (list) : Results of lasso fit
+runEnet <- function(seset, seed = 2019, alphamodel = 0.5){
   set.seed(seed)
 
   gene.names = as.character(rownames(rowData(seset)))
@@ -249,24 +241,24 @@ runEnet <- function(seset, seed = 2019){
   contrast <- contrasts(y)
   grid <- 10^ seq(10,-2, length=100)
   standardize = FALSE
-  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha=0.5,
+  fit <- glmnet::glmnet(x[train.names,], y[train.names], family = "binomial", alpha = alphamodel,
                         standardize = standardize, lambda = grid, intercept = FALSE)
 
   # use cross-validation on the training model.CV only for lambda
   cv.fit <- glmnet::cv.glmnet(x[train.names,], y[train.names], family = "binomial",
                               type.logistic="modified.Newton", standardize = standardize,
-                              lambda = grid, alpha=0.5, nfolds = length(train.names), #LOOCV
+                              lambda = grid, alpha = alphamodel, nfolds = length(train.names), #LOOCV
                               type.measure = "class", intercept = FALSE)
   #Select lambda min.
   lambda.min <- cv.fit$lambda.min
   #predict the classes
   pred.class <- predict(fit, newx = x[test.names,], type="class", s=lambda.min)
   #find the test error
-  tab <- table(pred.class,y[test.names])
+  tab <- table(pred.class,y[test.names]) # confusion matrix from test set samples
   testError <- mean(pred.class != y[test.names]) #how many predicted classes were incorrect
   #Fit the full dataset.
   final <- glmnet::glmnet(x, y,family = "binomial", standardize = standardize,
-                          lambda = grid, alpha = 1, intercept = FALSE)
+                          lambda = grid, alpha = alphamodel, intercept = FALSE)
   #Extract the coefficients
   coef <- predict(final, type="coefficients", s=lambda.min)
   idx <- which(!as.numeric(coef)==0)
