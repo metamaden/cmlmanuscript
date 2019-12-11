@@ -1,0 +1,952 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={exclusionbias},
+            pdfauthor={SKM},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+% grffile has become a legacy package: https://ctan.org/pkg/grffile
+\IfFileExists{grffile.sty}{%
+\usepackage{grffile}
+}{}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{exclusionbias}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{SKM}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{12/9/2019}
+
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(cmlmanuscript)}
+\KeywordTok{library}\NormalTok{(SummarizedExperiment)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: GenomicRanges
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: stats4
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: BiocGenerics
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: parallel
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'BiocGenerics'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:parallel':
+## 
+##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+##     clusterExport, clusterMap, parApply, parCapply, parLapply,
+##     parLapplyLB, parRapply, parSapply, parSapplyLB
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     IQR, mad, sd, var, xtabs
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     anyDuplicated, append, as.data.frame, basename, cbind, colnames,
+##     dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+##     grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
+##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+##     rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
+##     union, unique, unsplit, which, which.max, which.min
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: S4Vectors
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'S4Vectors'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:base':
+## 
+##     expand.grid
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: IRanges
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'IRanges'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:grDevices':
+## 
+##     windows
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: GenomeInfoDb
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: Biobase
+\end{verbatim}
+
+\begin{verbatim}
+## Welcome to Bioconductor
+## 
+##     Vignettes contain introductory material; view with
+##     'browseVignettes()'. To cite Bioconductor, see
+##     'citation("Biobase")', and for packages 'citation("pkgname")'.
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: DelayedArray
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: matrixStats
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'matrixStats'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:Biobase':
+## 
+##     anyMissing, rowMedians
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: BiocParallel
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'DelayedArray'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:matrixStats':
+## 
+##     colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     aperm, apply, rowsum
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{load}\NormalTok{(}\StringTok{"dataprep.Rdata"}\NormalTok{)}
+
+\NormalTok{statmatrix =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(}\DataTypeTok{replist =}\NormalTok{ lrep)\{}
+\NormalTok{  dfp <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(}\DataTypeTok{nrow=}\DecValTok{15}\NormalTok{,}\DataTypeTok{ncol=}\DecValTok{5}\NormalTok{))}
+  \KeywordTok{colnames}\NormalTok{(dfp) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"rep"}\NormalTok{,}\StringTok{"tpr"}\NormalTok{,}\StringTok{"tnr"}\NormalTok{,}\StringTok{"fdr"}\NormalTok{,}\StringTok{"forv"}\NormalTok{)}
+\NormalTok{  dfp}\OperatorTok{$}\NormalTok{rep <-}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{15}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{  postot <-}\StringTok{ }\KeywordTok{ncol}\NormalTok{(degfilt.se[,degfilt.se}\OperatorTok{$}\NormalTok{exptset.seahack}\OperatorTok{==}\StringTok{"test"} \OperatorTok{&}\StringTok{ }\NormalTok{degfilt.se}\OperatorTok{$}\NormalTok{deg.risk}\OperatorTok{==}\DecValTok{1}\NormalTok{])}
+\NormalTok{  falsetot <-}\StringTok{ }\KeywordTok{ncol}\NormalTok{(degfilt.se[,degfilt.se}\OperatorTok{$}\NormalTok{exptset.seahack}\OperatorTok{==}\StringTok{"test"} \OperatorTok{&}\StringTok{ }\NormalTok{degfilt.se}\OperatorTok{$}\NormalTok{deg.risk}\OperatorTok{==}\DecValTok{0}\NormalTok{])}
+  \CommentTok{# True positive rate, TPR = TP/P}
+\NormalTok{  dfp}\OperatorTok{$}\NormalTok{tpr <-}\StringTok{ }\KeywordTok{unlist}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(replist, }\ControlFlowTok{function}\NormalTok{(x)\{x}\OperatorTok{$}\NormalTok{confusionMatrix[}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{]}\OperatorTok{/}\NormalTok{postot\}))}
+  \CommentTok{# True negative rate, TNR = TF/F}
+\NormalTok{  dfp}\OperatorTok{$}\NormalTok{tnr <-}\StringTok{ }\KeywordTok{unlist}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(replist, }\ControlFlowTok{function}\NormalTok{(x)\{x}\OperatorTok{$}\NormalTok{confusionMatrix[}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{]}\OperatorTok{/}\NormalTok{falsetot\}))}
+  \CommentTok{# False discovery rate, FDR = 1 - (TP/[TP+FP])}
+
+\NormalTok{  dfp}\OperatorTok{$}\NormalTok{fdr <-}\StringTok{ }\KeywordTok{unlist}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(replist, }\ControlFlowTok{function}\NormalTok{(x)\{}
+\NormalTok{    tp =}\StringTok{ }\NormalTok{x}\OperatorTok{$}\NormalTok{confusionMatrix[}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{]; fp =}\StringTok{ }\NormalTok{x}\OperatorTok{$}\NormalTok{confusionMatrix[}\DecValTok{2}\NormalTok{,}\DecValTok{1}\NormalTok{]}
+\NormalTok{    fdr =}\StringTok{ }\DecValTok{1}\OperatorTok{-}\NormalTok{(tp}\OperatorTok{/}\NormalTok{(tp}\OperatorTok{+}\NormalTok{fp)); }\KeywordTok{return}\NormalTok{(fdr)}
+\NormalTok{    \}))}
+  
+  \CommentTok{# False omission rate, FOR = 1 - (TN/[TN+FN])}
+\NormalTok{  dfp}\OperatorTok{$}\NormalTok{forv <-}\StringTok{ }\KeywordTok{unlist}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(replist, }\ControlFlowTok{function}\NormalTok{(x)\{}
+\NormalTok{    tn =}\StringTok{ }\NormalTok{x}\OperatorTok{$}\NormalTok{confusionMatrix[}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{]; fn =}\StringTok{ }\NormalTok{x}\OperatorTok{$}\NormalTok{confusionMatrix[}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{]}
+\NormalTok{    forv =}\StringTok{ }\DecValTok{1}\OperatorTok{-}\NormalTok{(tn}\OperatorTok{/}\NormalTok{(tn}\OperatorTok{+}\NormalTok{fn)); }\KeywordTok{return}\NormalTok{(forv)}
+\NormalTok{    \}))}
+  \KeywordTok{return}\NormalTok{(dfp)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+We performed ablation tests to assess the impact of exclusion bias.
+Feature exclusion bias reflects the fact that feature assessment, and
+ultimate exlcusion or exclusion from penalized regression, is biased by
+inclusion or exclusion of other features. We showed this bias through
+ablation of penalized regression runs, using three penalization schema
+(lasso, ridge regression, and elastic net).
+
+\hypertarget{ablation-tests}{%
+\section{Ablation tests}\label{ablation-tests}}
+
+To perform ablation tests, we performed penalized regression with one of
+three penalization strategies (lasso, ridge regression, or elastic net).
+We initially fitted a model with the chosen schema. In subsequent reps,
+we excluded features with the largest coefficients, or any features with
+nonzero coefficients for lasso, and repeated penalized regression.
+
+\hypertarget{lasso}{%
+\subsection{Lasso}\label{lasso}}
+
+Penalized regressions with the lasso penalty can eliminate features by
+assigning coefficients close to or equal to 0. We ran lasso with the
+\texttt{glmnet} function by assigning an alpha of \texttt{1}.
+
+\hypertarget{ablation-tests-1}{%
+\subsubsection{Ablation tests}\label{ablation-tests-1}}
+
+Across ablation tests using the lasso method, we excluded genes with
+non-zero coefficients as follows.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ptype =}\StringTok{ "lasso"}
+\NormalTok{lexclude =}\StringTok{ }\KeywordTok{list}\NormalTok{()}
+\NormalTok{lrep =}\StringTok{ }\KeywordTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{15}\NormalTok{)\{}
+  \ControlFlowTok{if}\NormalTok{(i }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{)\{}
+\NormalTok{    lrep[[i]] =}\StringTok{ }\KeywordTok{runLasso}\NormalTok{(}\DataTypeTok{seset =}\NormalTok{ degfilt.se)}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    lrep[[i]] =}\StringTok{ }\KeywordTok{runLasso}\NormalTok{(}\DataTypeTok{seset=}\NormalTok{degfilt.se[}\OperatorTok{!}\KeywordTok{rownames}\NormalTok{(degfilt.se) }\OperatorTok{%in%}\StringTok{ }\KeywordTok{unlist}\NormalTok{(lexclude),])}
+\NormalTok{  \}}
+\NormalTok{  lexclude[[i]] =}\StringTok{ }\KeywordTok{names}\NormalTok{(lrep[[i]]}\OperatorTok{$}\NormalTok{nonzero.coef)}
+  \KeywordTok{message}\NormalTok{(}\StringTok{"finished "}\NormalTok{, ptype,}\StringTok{" rep "}\NormalTok{, i)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## finished lasso rep 1
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 2
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 3
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 4
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 5
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 6
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 7
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 8
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 9
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 10
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 11
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 12
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 13
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 14
+\end{verbatim}
+
+\begin{verbatim}
+## finished lasso rep 15
+\end{verbatim}
+
+\hypertarget{results-summary-plots}{%
+\subsubsection{Results summary plots}\label{results-summary-plots}}
+
+Model performances are summarized across lasso reps in the following
+plots.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get performance statistics matrix}
+\NormalTok{dfp =}\StringTok{ }\KeywordTok{statmatrix}\NormalTok{(lrep)}
+
+\CommentTok{# model gene count}
+\NormalTok{bpm =}\StringTok{ }\KeywordTok{unlist}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(lrep, }\ControlFlowTok{function}\NormalTok{(x)\{m =}\StringTok{ }\NormalTok{x}\OperatorTok{$}\NormalTok{nonzero.coef; }\KeywordTok{length}\NormalTok{(m)\})) }\CommentTok{# model bpx }
+\CommentTok{# excluded gene counts}
+\NormalTok{sumx =}\StringTok{ }\DecValTok{0}\NormalTok{; bpx =}\StringTok{ }\KeywordTok{c}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{15}\NormalTok{)\{ sumx =}\StringTok{ }\KeywordTok{sum}\NormalTok{(}\KeywordTok{c}\NormalTok{(sumx, }\KeywordTok{length}\NormalTok{(lexclude[[i]]))); bpx =}\StringTok{ }\KeywordTok{c}\NormalTok{(bpx, sumx)\}}
+
+\CommentTok{# make plots}
+\NormalTok{ptype =}\StringTok{ "Lasso"}
+\NormalTok{pmain =}\StringTok{ }\KeywordTok{paste0}\NormalTok{(ptype, }\StringTok{" Ablation Model Performances"}\NormalTok{)}
+
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{),}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DataTypeTok{mar=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\NormalTok{\{}
+  \CommentTok{# plot 1}
+  \KeywordTok{plot}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tpr, }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.6}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tpr, }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tnr, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tnr, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h=}\FloatTok{0.8}\NormalTok{,}\DataTypeTok{col=}\StringTok{"black"}\NormalTok{,}\DataTypeTok{lty=}\DecValTok{2}\NormalTok{,}\DataTypeTok{lwd=}\DecValTok{1}\NormalTok{)}
+
+\KeywordTok{legend}\NormalTok{(}\StringTok{"bottomleft"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"TPR"}\NormalTok{,}\StringTok{"TNR"}\NormalTok{), }
+       \DataTypeTok{xpd =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{horiz =} \OtherTok{TRUE}\NormalTok{,}
+       \DataTypeTok{bty =} \StringTok{"n"}\NormalTok{, }\DataTypeTok{pch =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\DataTypeTok{lwd=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+       \DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{,}\StringTok{"blue"}\NormalTok{), }\DataTypeTok{cex =} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{# plot 2}
+\KeywordTok{plot}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{fdr, }\DataTypeTok{col=}\StringTok{"forestgreen"}\NormalTok{, }\DataTypeTok{ylim=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\FloatTok{0.3}\NormalTok{))}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep,dfp}\OperatorTok{$}\NormalTok{fdr, }\DataTypeTok{col=}\StringTok{"forestgreen"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep,dfp}\OperatorTok{$}\NormalTok{forv, }\DataTypeTok{col=}\StringTok{"purple"}\NormalTok{)}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep,dfp}\OperatorTok{$}\NormalTok{forv, }\DataTypeTok{col=}\StringTok{"purple"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h=}\FloatTok{0.2}\NormalTok{,}\DataTypeTok{col=}\StringTok{"black"}\NormalTok{,}\DataTypeTok{lty=}\DecValTok{2}\NormalTok{,}\DataTypeTok{lwd=}\DecValTok{1}\NormalTok{)}
+
+\KeywordTok{legend}\NormalTok{(}\StringTok{"topleft"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"FDR"}\NormalTok{,}\StringTok{"FOR"}\NormalTok{), }
+       \DataTypeTok{xpd =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{horiz =} \OtherTok{TRUE}\NormalTok{,}
+       \DataTypeTok{bty =} \StringTok{"n"}\NormalTok{, }\DataTypeTok{pch =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\DataTypeTok{lwd=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+       \DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"forestgreen"}\NormalTok{,}\StringTok{"purple"}\NormalTok{), }\DataTypeTok{cex =} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{# plot 3: genes excluded per rep}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{), bpx, }\DataTypeTok{xlab =} \StringTok{""}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{""}\NormalTok{) }\CommentTok{# total excluded genes by rep}
+\KeywordTok{lines}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{), bpx, }\DataTypeTok{col =} \StringTok{"red"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{), bpx, }\DataTypeTok{col =} \StringTok{"red"}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"topleft"}\NormalTok{, }\DataTypeTok{bty =} \StringTok{"n"}\NormalTok{, }\DataTypeTok{legend =} \StringTok{"Num. Genes Excluded"}\NormalTok{)}
+
+\CommentTok{# plot 4: features per model}
+\KeywordTok{barplot}\NormalTok{(bpm, }\DataTypeTok{col =} \StringTok{"purple"}\NormalTok{, }\DataTypeTok{names.arg =} \KeywordTok{paste0}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{)))}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"topleft"}\NormalTok{, }\DataTypeTok{legend =} \StringTok{"Genes per Model"}\NormalTok{, }\DataTypeTok{bty =} \StringTok{"n"}\NormalTok{)}
+
+\NormalTok{\}}
+\KeywordTok{mtext}\NormalTok{(}\StringTok{"Rep #"}\NormalTok{, }\DataTypeTok{side =} \DecValTok{1}\NormalTok{, }\DataTypeTok{outer =}\NormalTok{ T)}
+\KeywordTok{mtext}\NormalTok{(}\StringTok{"Value"}\NormalTok{, }\DataTypeTok{side =} \DecValTok{2}\NormalTok{, }\DataTypeTok{outer =}\NormalTok{ T)}
+\KeywordTok{mtext}\NormalTok{(pmain, }\DataTypeTok{side =} \DecValTok{3}\NormalTok{, }\DataTypeTok{outer =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ablationtests_files/figure-latex/lassoresults-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# dev.off()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ridge-regression}{%
+\subsection{Ridge regression}\label{ridge-regression}}
+
+Regression using ridge or L1 penalty does not eliminate features by
+assigning a 0 coefficient. Ridge regression was run using the
+\texttt{glmnet} function by assigning an alpha of \texttt{0}.
+
+\hypertarget{ablation-tests-2}{%
+\subsubsection{Ablation tests}\label{ablation-tests-2}}
+
+We removed genes with the top 5th quantile absolute importance
+(coefficient magnitude) between ridge regression repetitions, as
+follows.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ptype =}\StringTok{ "ridge regression"}
+\NormalTok{qimpfilt =}\StringTok{ }\DecValTok{5}
+\NormalTok{lexclude =}\StringTok{ }\KeywordTok{list}\NormalTok{()}
+\NormalTok{lrep =}\StringTok{ }\KeywordTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{15}\NormalTok{)\{}
+  \ControlFlowTok{if}\NormalTok{(i }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{)\{}
+\NormalTok{    lrep[[i]] =}\StringTok{ }\KeywordTok{runRidge}\NormalTok{(}\DataTypeTok{seset =}\NormalTok{ degfilt.se)}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    lrep[[i]] =}\StringTok{ }\KeywordTok{runRidge}\NormalTok{(}\DataTypeTok{seset =}\NormalTok{ degfilt.se[}\OperatorTok{!}\KeywordTok{rownames}\NormalTok{(degfilt.se) }\OperatorTok{%in%}\StringTok{ }\KeywordTok{unlist}\NormalTok{(lexclude),])}
+\NormalTok{  \}}
+\NormalTok{  coeffi =}\StringTok{ }\NormalTok{lrep[[i]]}\OperatorTok{$}\NormalTok{nonzero.coef}
+\NormalTok{  qcoeffilt =}\StringTok{ }\KeywordTok{quantile}\NormalTok{(}\KeywordTok{abs}\NormalTok{(coeffi), }\KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.05}\NormalTok{))[}\DecValTok{20}\NormalTok{]}
+\NormalTok{  lexclude[[i]] =}\StringTok{ }\KeywordTok{names}\NormalTok{(coeffi[coeffi}\OperatorTok{>=}\NormalTok{qcoeffilt])}
+  \KeywordTok{message}\NormalTok{(}\StringTok{"finished "}\NormalTok{, ptype,}\StringTok{" rep "}\NormalTok{, i)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 1
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 4
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 5
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 6
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 7
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 8
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 9
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 10
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 11
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 12
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 13
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 14
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished ridge regression rep 15
+\end{verbatim}
+
+\hypertarget{results-summary-plots-1}{%
+\subsubsection{Results summary plots}\label{results-summary-plots-1}}
+
+Model performances are summarized across ridge regression reps in the
+following plots.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get performance statistics matrix}
+\NormalTok{dfp =}\StringTok{ }\KeywordTok{statmatrix}\NormalTok{(lrep)}
+
+\CommentTok{# model gene count}
+\NormalTok{bpm =}\StringTok{ }\KeywordTok{unlist}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(lrep, }\ControlFlowTok{function}\NormalTok{(x)\{m =}\StringTok{ }\NormalTok{x}\OperatorTok{$}\NormalTok{nonzero.coef; }\KeywordTok{length}\NormalTok{(m)\})) }\CommentTok{# model bpx }
+\CommentTok{# excluded gene counts}
+\NormalTok{sumx =}\StringTok{ }\DecValTok{0}\NormalTok{; bpx =}\StringTok{ }\KeywordTok{c}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{15}\NormalTok{)\{ sumx =}\StringTok{ }\KeywordTok{sum}\NormalTok{(}\KeywordTok{c}\NormalTok{(sumx, }\KeywordTok{length}\NormalTok{(lexclude[[i]]))); bpx =}\StringTok{ }\KeywordTok{c}\NormalTok{(bpx, sumx)\}}
+
+\CommentTok{# make plots}
+\NormalTok{ptype =}\StringTok{ "Ridge Regression"}
+\NormalTok{pmain =}\StringTok{ }\KeywordTok{paste0}\NormalTok{(ptype, }\StringTok{" Ablation Model Performances"}\NormalTok{)}
+
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{),}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DataTypeTok{mar=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\NormalTok{\{}
+  \CommentTok{# plot 1}
+  \KeywordTok{plot}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tpr, }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.6}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tpr, }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tnr, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tnr, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h=}\FloatTok{0.8}\NormalTok{,}\DataTypeTok{col=}\StringTok{"black"}\NormalTok{,}\DataTypeTok{lty=}\DecValTok{2}\NormalTok{,}\DataTypeTok{lwd=}\DecValTok{1}\NormalTok{)}
+
+\KeywordTok{legend}\NormalTok{(}\StringTok{"bottomleft"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"TPR"}\NormalTok{,}\StringTok{"TNR"}\NormalTok{), }
+       \DataTypeTok{xpd =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{horiz =} \OtherTok{TRUE}\NormalTok{,}
+       \DataTypeTok{bty =} \StringTok{"n"}\NormalTok{, }\DataTypeTok{pch =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\DataTypeTok{lwd=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+       \DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{,}\StringTok{"blue"}\NormalTok{), }\DataTypeTok{cex =} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{# plot 2}
+\KeywordTok{plot}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{fdr, }\DataTypeTok{col=}\StringTok{"forestgreen"}\NormalTok{, }\DataTypeTok{ylim=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\FloatTok{0.3}\NormalTok{))}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep,dfp}\OperatorTok{$}\NormalTok{fdr, }\DataTypeTok{col=}\StringTok{"forestgreen"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep,dfp}\OperatorTok{$}\NormalTok{forv, }\DataTypeTok{col=}\StringTok{"purple"}\NormalTok{)}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep,dfp}\OperatorTok{$}\NormalTok{forv, }\DataTypeTok{col=}\StringTok{"purple"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h=}\FloatTok{0.2}\NormalTok{,}\DataTypeTok{col=}\StringTok{"black"}\NormalTok{,}\DataTypeTok{lty=}\DecValTok{2}\NormalTok{,}\DataTypeTok{lwd=}\DecValTok{1}\NormalTok{)}
+
+\KeywordTok{legend}\NormalTok{(}\StringTok{"topleft"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"FDR"}\NormalTok{,}\StringTok{"FOR"}\NormalTok{), }
+       \DataTypeTok{xpd =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{horiz =} \OtherTok{TRUE}\NormalTok{,}
+       \DataTypeTok{bty =} \StringTok{"n"}\NormalTok{, }\DataTypeTok{pch =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\DataTypeTok{lwd=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+       \DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"forestgreen"}\NormalTok{,}\StringTok{"purple"}\NormalTok{), }\DataTypeTok{cex =} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{# plot 3: genes excluded per rep}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{), bpx, }\DataTypeTok{xlab =} \StringTok{""}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{""}\NormalTok{) }\CommentTok{# total excluded genes by rep}
+\KeywordTok{lines}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{), bpx, }\DataTypeTok{col =} \StringTok{"red"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{), bpx, }\DataTypeTok{col =} \StringTok{"red"}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"topleft"}\NormalTok{, }\DataTypeTok{bty =} \StringTok{"n"}\NormalTok{, }\DataTypeTok{legend =} \StringTok{"Num. Genes Excluded"}\NormalTok{)}
+
+\CommentTok{# plot 4: features per model}
+\KeywordTok{barplot}\NormalTok{(bpm, }\DataTypeTok{col =} \StringTok{"purple"}\NormalTok{, }\DataTypeTok{names.arg =} \KeywordTok{paste0}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{)))}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"topleft"}\NormalTok{, }\DataTypeTok{legend =} \StringTok{"Genes per Model"}\NormalTok{, }\DataTypeTok{bty =} \StringTok{"n"}\NormalTok{)}
+
+\NormalTok{\}}
+\KeywordTok{mtext}\NormalTok{(}\StringTok{"Rep #"}\NormalTok{, }\DataTypeTok{side =} \DecValTok{1}\NormalTok{, }\DataTypeTok{outer =}\NormalTok{ T)}
+\KeywordTok{mtext}\NormalTok{(}\StringTok{"Value"}\NormalTok{, }\DataTypeTok{side =} \DecValTok{2}\NormalTok{, }\DataTypeTok{outer =}\NormalTok{ T)}
+\KeywordTok{mtext}\NormalTok{(pmain, }\DataTypeTok{side =} \DecValTok{3}\NormalTok{, }\DataTypeTok{outer =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ablationtests_files/figure-latex/ridgeresults-1.pdf}
+
+\hypertarget{elastic-net}{%
+\subsection{Elastic net}\label{elastic-net}}
+
+Elastic net penalized regression uses mixing of L1 (ridge regression)
+and L2 (lasso) penalties. It can eliminate features by assigning
+coefficients close to or equal to 0. We ran elastic net with the
+\texttt{glmnet} function by assigning an alpha of \texttt{0.5}.
+
+\hypertarget{ablation-tests-3}{%
+\subsubsection{Ablation tests}\label{ablation-tests-3}}
+
+Similar to lasso ablation tests, we excluded features with nonzero
+coefficients between repetitions of elastic net repetitions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ptype =}\StringTok{ "elastic net"}
+\NormalTok{qimpfilt =}\StringTok{ }\DecValTok{5}
+\NormalTok{lexclude =}\StringTok{ }\KeywordTok{list}\NormalTok{()}
+\NormalTok{lrep =}\StringTok{ }\KeywordTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{15}\NormalTok{)\{}
+  \ControlFlowTok{if}\NormalTok{(i }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{)\{}
+\NormalTok{    lrep[[i]] =}\StringTok{ }\KeywordTok{runEnet}\NormalTok{(}\DataTypeTok{seset =}\NormalTok{ degfilt.se)}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    lrep[[i]] =}\StringTok{ }\KeywordTok{runEnet}\NormalTok{(}\DataTypeTok{seset =}\NormalTok{ degfilt.se[}\OperatorTok{!}\KeywordTok{rownames}\NormalTok{(degfilt.se) }\OperatorTok{%in%}\StringTok{ }\KeywordTok{unlist}\NormalTok{(lexclude),])}
+\NormalTok{  \}}
+\NormalTok{  lexclude[[i]] =}\StringTok{ }\KeywordTok{names}\NormalTok{(lrep[[i]]}\OperatorTok{$}\NormalTok{nonzero.coef)}
+  \KeywordTok{message}\NormalTok{(}\StringTok{"finished "}\NormalTok{, ptype,}\StringTok{" rep "}\NormalTok{, i)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 1
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 4
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 5
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 6
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 7
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 8
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 9
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 10
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 11
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 12
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 13
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 14
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per
+## fold
+\end{verbatim}
+
+\begin{verbatim}
+## finished elastic net rep 15
+\end{verbatim}
+
+\hypertarget{results-summary-plots-2}{%
+\subsubsection{Results summary plots}\label{results-summary-plots-2}}
+
+Model performances are summarized across elastic net reps in the
+following plots.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get performance statistics matrix}
+\NormalTok{dfp =}\StringTok{ }\KeywordTok{statmatrix}\NormalTok{(lrep)}
+
+\CommentTok{# model gene count}
+\NormalTok{bpm =}\StringTok{ }\KeywordTok{unlist}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(lrep, }\ControlFlowTok{function}\NormalTok{(x)\{m =}\StringTok{ }\NormalTok{x}\OperatorTok{$}\NormalTok{nonzero.coef; }\KeywordTok{length}\NormalTok{(m)\})) }\CommentTok{# model bpx }
+\CommentTok{# excluded gene counts}
+\NormalTok{sumx =}\StringTok{ }\DecValTok{0}\NormalTok{; bpx =}\StringTok{ }\KeywordTok{c}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{15}\NormalTok{)\{ sumx =}\StringTok{ }\KeywordTok{sum}\NormalTok{(}\KeywordTok{c}\NormalTok{(sumx, }\KeywordTok{length}\NormalTok{(lexclude[[i]]))); bpx =}\StringTok{ }\KeywordTok{c}\NormalTok{(bpx, sumx)\}}
+
+\CommentTok{# make plots}
+\NormalTok{ptype =}\StringTok{ "Elastic Net"}
+\NormalTok{pmain =}\StringTok{ }\KeywordTok{paste0}\NormalTok{(ptype, }\StringTok{" Ablation Model Performances"}\NormalTok{)}
+
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{),}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DataTypeTok{mar=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\NormalTok{\{}
+  \CommentTok{# plot 1}
+  \KeywordTok{plot}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tpr, }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.6}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tpr, }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tnr, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{tnr, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h=}\FloatTok{0.8}\NormalTok{,}\DataTypeTok{col=}\StringTok{"black"}\NormalTok{,}\DataTypeTok{lty=}\DecValTok{2}\NormalTok{,}\DataTypeTok{lwd=}\DecValTok{1}\NormalTok{)}
+
+\KeywordTok{legend}\NormalTok{(}\StringTok{"bottomleft"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"TPR"}\NormalTok{,}\StringTok{"TNR"}\NormalTok{), }
+       \DataTypeTok{xpd =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{horiz =} \OtherTok{TRUE}\NormalTok{,}
+       \DataTypeTok{bty =} \StringTok{"n"}\NormalTok{, }\DataTypeTok{pch =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\DataTypeTok{lwd=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+       \DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{,}\StringTok{"blue"}\NormalTok{), }\DataTypeTok{cex =} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{# plot 2}
+\KeywordTok{plot}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep, dfp}\OperatorTok{$}\NormalTok{fdr, }\DataTypeTok{col=}\StringTok{"forestgreen"}\NormalTok{, }\DataTypeTok{ylim=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\FloatTok{0.3}\NormalTok{))}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep,dfp}\OperatorTok{$}\NormalTok{fdr, }\DataTypeTok{col=}\StringTok{"forestgreen"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep,dfp}\OperatorTok{$}\NormalTok{forv, }\DataTypeTok{col=}\StringTok{"purple"}\NormalTok{)}
+\KeywordTok{lines}\NormalTok{(dfp}\OperatorTok{$}\NormalTok{rep,dfp}\OperatorTok{$}\NormalTok{forv, }\DataTypeTok{col=}\StringTok{"purple"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h=}\FloatTok{0.2}\NormalTok{,}\DataTypeTok{col=}\StringTok{"black"}\NormalTok{,}\DataTypeTok{lty=}\DecValTok{2}\NormalTok{,}\DataTypeTok{lwd=}\DecValTok{1}\NormalTok{)}
+
+\KeywordTok{legend}\NormalTok{(}\StringTok{"topleft"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"FDR"}\NormalTok{,}\StringTok{"FOR"}\NormalTok{), }
+       \DataTypeTok{xpd =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{horiz =} \OtherTok{TRUE}\NormalTok{,}
+       \DataTypeTok{bty =} \StringTok{"n"}\NormalTok{, }\DataTypeTok{pch =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\DataTypeTok{lwd=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+       \DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"forestgreen"}\NormalTok{,}\StringTok{"purple"}\NormalTok{), }\DataTypeTok{cex =} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{# plot 3: genes excluded per rep}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{), bpx, }\DataTypeTok{xlab =} \StringTok{""}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{""}\NormalTok{) }\CommentTok{# total excluded genes by rep}
+\KeywordTok{lines}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{), bpx, }\DataTypeTok{col =} \StringTok{"red"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{), bpx, }\DataTypeTok{col =} \StringTok{"red"}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"topleft"}\NormalTok{, }\DataTypeTok{bty =} \StringTok{"n"}\NormalTok{, }\DataTypeTok{legend =} \StringTok{"Num. Genes Excluded"}\NormalTok{)}
+
+\CommentTok{# plot 4: features per model}
+\KeywordTok{barplot}\NormalTok{(bpm, }\DataTypeTok{col =} \StringTok{"purple"}\NormalTok{, }\DataTypeTok{names.arg =} \KeywordTok{paste0}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{1}\NormalTok{)))}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"topleft"}\NormalTok{, }\DataTypeTok{legend =} \StringTok{"Genes per Model"}\NormalTok{, }\DataTypeTok{bty =} \StringTok{"n"}\NormalTok{)}
+
+\NormalTok{\}}
+\KeywordTok{mtext}\NormalTok{(}\StringTok{"Rep #"}\NormalTok{, }\DataTypeTok{side =} \DecValTok{1}\NormalTok{, }\DataTypeTok{outer =}\NormalTok{ T)}
+\KeywordTok{mtext}\NormalTok{(}\StringTok{"Value"}\NormalTok{, }\DataTypeTok{side =} \DecValTok{2}\NormalTok{, }\DataTypeTok{outer =}\NormalTok{ T)}
+\KeywordTok{mtext}\NormalTok{(pmain, }\DataTypeTok{side =} \DecValTok{3}\NormalTok{, }\DataTypeTok{outer =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ablationtests_files/figure-latex/enetresults-1.pdf}
+
+
+\end{document}

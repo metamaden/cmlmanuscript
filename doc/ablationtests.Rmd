@@ -2,12 +2,41 @@
 title: "exclusionbias"
 author: "SKM"
 date: "12/9/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r docprep, eval = TRUE, echo = TRUE}
 library(cmlmanuscript)
-load(dataprep.Rdata)
+library(SummarizedExperiment)
+load("dataprep.Rdata")
+
+statmatrix = function(replist = lrep){
+  dfp <- as.data.frame(matrix(nrow=15,ncol=5))
+  colnames(dfp) <- c("rep","tpr","tnr","fdr","forv")
+  dfp$rep <- seq(1,15,1)
+  postot <- ncol(degfilt.se[,degfilt.se$exptset.seahack=="test" & degfilt.se$deg.risk==1])
+  falsetot <- ncol(degfilt.se[,degfilt.se$exptset.seahack=="test" & degfilt.se$deg.risk==0])
+  # True positive rate, TPR = TP/P
+  dfp$tpr <- unlist(lapply(replist, function(x){x$confusionMatrix[2,2]/postot}))
+  # True negative rate, TNR = TF/F
+  dfp$tnr <- unlist(lapply(replist, function(x){x$confusionMatrix[1,1]/falsetot}))
+  # False discovery rate, FDR = 1 - (TP/[TP+FP])
+
+  dfp$fdr <- unlist(lapply(replist, function(x){
+    tp = x$confusionMatrix[2,2]; fp = x$confusionMatrix[2,1]
+    fdr = 1-(tp/(tp+fp)); return(fdr)
+    }))
+  
+  # False omission rate, FOR = 1 - (TN/[TN+FN])
+  dfp$forv <- unlist(lapply(replist, function(x){
+    tn = x$confusionMatrix[1,1]; fn = x$confusionMatrix[1,2]
+    forv = 1-(tn/(tn+fn)); return(forv)
+    }))
+  return(dfp)
+}
+
 ```
 
 We performed ablation tests to assess the impact of exclusion bias. Feature exclusion bias reflects the fact that feature assessment, and ultimate exlcusion or exclusion from penalized regression, is biased by inclusion or exclusion of other features. We showed this bias through ablation of penalized regression runs, using three penalization schema (lasso, ridge regression, and elastic net).
@@ -17,6 +46,12 @@ We performed ablation tests to assess the impact of exclusion bias. Feature excl
 To perform ablation tests, we performed penalized regression with one of three penalization strategies (lasso, ridge regression, or elastic net). We initially fitted a model with the chosen schema. In subsequent reps, we excluded features with the largest coefficients, or any features with nonzero coefficients for lasso, and repeated penalized regression.
 
 ## Lasso
+
+Penalized regressions with the lasso penalty can eliminate features by assigning coefficients close to or equal to 0. We ran lasso with the `glmnet` function by assigning an alpha of `1`.
+
+### Ablation tests
+
+Across ablation tests using the lasso method, we excluded genes with non-zero coefficients as follows.
 
 ```{r lassoreps, warning=FALSE}
 ptype = "lasso"
@@ -33,11 +68,77 @@ for(i in 1:15){
 }
 ```
 
+### Results summary plots
+
+Model performances are summarized across lasso reps in the following plots.
+
+```{r lassoresults, echo = T, eval = T}
+# get performance statistics matrix
+dfp = statmatrix(lrep)
+
+# model gene count
+bpm = unlist(lapply(lrep, function(x){m = x$nonzero.coef; length(m)})) # model bpx 
+# excluded gene counts
+sumx = 0; bpx = c()
+for(i in 1:15){ sumx = sum(c(sumx, length(lexclude[[i]]))); bpx = c(bpx, sumx)}
+
+# make plots
+ptype = "Lasso"
+pmain = paste0(ptype, " Ablation Model Performances")
+
+par(mfrow=c(4, 1),oma=c(1, 1, 3, 1), mar=c(2, 2, 1, 1))
+{
+  # plot 1
+  plot(dfp$rep, dfp$tpr, col="blue", ylim = c(0.6,1))
+lines(dfp$rep, dfp$tpr, col="blue")
+points(dfp$rep, dfp$tnr, col="red")
+lines(dfp$rep, dfp$tnr, col="red")
+abline(h=0.8,col="black",lty=2,lwd=1)
+
+legend("bottomleft", c("TPR","TNR"), 
+       xpd = TRUE, horiz = TRUE,
+       bty = "n", pch = c(1,1), lwd=c(1,1),
+       col = c("red","blue"), cex = 1)
+
+# plot 2
+plot(dfp$rep, dfp$fdr, col="forestgreen", ylim=c(0,0.3))
+lines(dfp$rep,dfp$fdr, col="forestgreen")
+points(dfp$rep,dfp$forv, col="purple")
+lines(dfp$rep,dfp$forv, col="purple")
+abline(h=0.2,col="black",lty=2,lwd=1)
+
+legend("topleft", c("FDR","FOR"), 
+       xpd = TRUE, horiz = TRUE,
+       bty = "n", pch = c(1,1), lwd=c(1,1),
+       col = c("forestgreen","purple"), cex = 1)
+
+# plot 3: genes excluded per rep
+plot(seq(1, 15, 1), bpx, xlab = "", ylab = "") # total excluded genes by rep
+lines(seq(1, 15, 1), bpx, col = "red")
+points(seq(1, 15, 1), bpx, col = "red")
+legend("topleft", bty = "n", legend = "Num. Genes Excluded")
+
+# plot 4: features per model
+barplot(bpm, col = "purple", names.arg = paste0(seq(1, 15, 1)))
+legend("topleft", legend = "Genes per Model", bty = "n")
+
+}
+mtext("Rep #", side = 1, outer = T)
+mtext("Value", side = 2, outer = T)
+mtext(pmain, side = 3, outer = T)
+
+# dev.off()
+```
+
 ## Ridge regression
 
-Because ridge regression does not eliminate features by assignment of 0 coefficients, we removed genes with the top 5th quantile absolute importance (coefficient magnitude) between repetitions.
+Regression using ridge or L1 penalty does not eliminate features by assigning a 0 coefficient. Ridge regression was run using the `glmnet` function by assigning an alpha of `0`.
 
-```{r ridgereps, warning=FALSE}
+### Ablation tests
+
+We removed genes with the top 5th quantile absolute importance (coefficient magnitude) between ridge regression repetitions, as follows.
+
+```{r ridgereps, eval = T, echo = T}
 ptype = "ridge regression"
 qimpfilt = 5
 lexclude = list()
@@ -55,11 +156,75 @@ for(i in 1:15){
 }
 ```
 
+### Results summary plots
+
+Model performances are summarized across ridge regression reps in the following plots.
+
+```{r ridgeresults, eval = T, echo = T}
+# get performance statistics matrix
+dfp = statmatrix(lrep)
+
+# model gene count
+bpm = unlist(lapply(lrep, function(x){m = x$nonzero.coef; length(m)})) # model bpx 
+# excluded gene counts
+sumx = 0; bpx = c()
+for(i in 1:15){ sumx = sum(c(sumx, length(lexclude[[i]]))); bpx = c(bpx, sumx)}
+
+# make plots
+ptype = "Ridge Regression"
+pmain = paste0(ptype, " Ablation Model Performances")
+
+par(mfrow=c(4, 1),oma=c(1, 1, 3, 1), mar=c(2, 2, 1, 1))
+{
+  # plot 1
+  plot(dfp$rep, dfp$tpr, col="blue", ylim = c(0.6,1))
+lines(dfp$rep, dfp$tpr, col="blue")
+points(dfp$rep, dfp$tnr, col="red")
+lines(dfp$rep, dfp$tnr, col="red")
+abline(h=0.8,col="black",lty=2,lwd=1)
+
+legend("bottomleft", c("TPR","TNR"), 
+       xpd = TRUE, horiz = TRUE,
+       bty = "n", pch = c(1,1), lwd=c(1,1),
+       col = c("red","blue"), cex = 1)
+
+# plot 2
+plot(dfp$rep, dfp$fdr, col="forestgreen", ylim=c(0,0.3))
+lines(dfp$rep,dfp$fdr, col="forestgreen")
+points(dfp$rep,dfp$forv, col="purple")
+lines(dfp$rep,dfp$forv, col="purple")
+abline(h=0.2,col="black",lty=2,lwd=1)
+
+legend("topleft", c("FDR","FOR"), 
+       xpd = TRUE, horiz = TRUE,
+       bty = "n", pch = c(1,1), lwd=c(1,1),
+       col = c("forestgreen","purple"), cex = 1)
+
+# plot 3: genes excluded per rep
+plot(seq(1, 15, 1), bpx, xlab = "", ylab = "") # total excluded genes by rep
+lines(seq(1, 15, 1), bpx, col = "red")
+points(seq(1, 15, 1), bpx, col = "red")
+legend("topleft", bty = "n", legend = "Num. Genes Excluded")
+
+# plot 4: features per model
+barplot(bpm, col = "purple", names.arg = paste0(seq(1, 15, 1)))
+legend("topleft", legend = "Genes per Model", bty = "n")
+
+}
+mtext("Rep #", side = 1, outer = T)
+mtext("Value", side = 2, outer = T)
+mtext(pmain, side = 3, outer = T)
+```
+
 ## Elastic net 
+
+Elastic net penalized regression uses mixing of L1 (ridge regression) and L2 (lasso) penalties. It can eliminate features by assigning coefficients close to or equal to 0. We ran elastic net with the `glmnet` function by assigning an alpha of `0.5`.
+
+### Ablation tests
 
 Similar to lasso ablation tests, we excluded features with nonzero coefficients between repetitions of elastic net repetitions.
 
-```{r enetreps, warning=FALSE}
+```{r enetreps, eval = T, echo = T}
 ptype = "elastic net"
 qimpfilt = 5
 lexclude = list()
@@ -73,4 +238,64 @@ for(i in 1:15){
   lexclude[[i]] = names(lrep[[i]]$nonzero.coef)
   message("finished ", ptype," rep ", i)
 }
+```
+
+### Results summary plots
+
+Model performances are summarized across elastic net reps in the following plots.
+
+```{r enetresults, echo = T, eval = T}
+# get performance statistics matrix
+dfp = statmatrix(lrep)
+
+# model gene count
+bpm = unlist(lapply(lrep, function(x){m = x$nonzero.coef; length(m)})) # model bpx 
+# excluded gene counts
+sumx = 0; bpx = c()
+for(i in 1:15){ sumx = sum(c(sumx, length(lexclude[[i]]))); bpx = c(bpx, sumx)}
+
+# make plots
+ptype = "Elastic Net"
+pmain = paste0(ptype, " Ablation Model Performances")
+
+par(mfrow=c(4, 1),oma=c(1, 1, 3, 1), mar=c(2, 2, 1, 1))
+{
+  # plot 1
+  plot(dfp$rep, dfp$tpr, col="blue", ylim = c(0.6,1))
+lines(dfp$rep, dfp$tpr, col="blue")
+points(dfp$rep, dfp$tnr, col="red")
+lines(dfp$rep, dfp$tnr, col="red")
+abline(h=0.8,col="black",lty=2,lwd=1)
+
+legend("bottomleft", c("TPR","TNR"), 
+       xpd = TRUE, horiz = TRUE,
+       bty = "n", pch = c(1,1), lwd=c(1,1),
+       col = c("red","blue"), cex = 1)
+
+# plot 2
+plot(dfp$rep, dfp$fdr, col="forestgreen", ylim=c(0,0.3))
+lines(dfp$rep,dfp$fdr, col="forestgreen")
+points(dfp$rep,dfp$forv, col="purple")
+lines(dfp$rep,dfp$forv, col="purple")
+abline(h=0.2,col="black",lty=2,lwd=1)
+
+legend("topleft", c("FDR","FOR"), 
+       xpd = TRUE, horiz = TRUE,
+       bty = "n", pch = c(1,1), lwd=c(1,1),
+       col = c("forestgreen","purple"), cex = 1)
+
+# plot 3: genes excluded per rep
+plot(seq(1, 15, 1), bpx, xlab = "", ylab = "") # total excluded genes by rep
+lines(seq(1, 15, 1), bpx, col = "red")
+points(seq(1, 15, 1), bpx, col = "red")
+legend("topleft", bty = "n", legend = "Num. Genes Excluded")
+
+# plot 4: features per model
+barplot(bpm, col = "purple", names.arg = paste0(seq(1, 15, 1)))
+legend("topleft", legend = "Genes per Model", bty = "n")
+
+}
+mtext("Rep #", side = 1, outer = T)
+mtext("Value", side = 2, outer = T)
+mtext(pmain, side = 3, outer = T)
 ```
